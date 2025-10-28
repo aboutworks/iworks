@@ -1,0 +1,30 @@
+/*
+
+This CSS file will be included with your plugin, and
+available in the app when your plugin is enabled.
+
+If your plugin does not need CSS, delete this file.
+
+*/
+
+.markdown-highlight-modal h1 {
+    color: #ff4500;
+    font-size: 1.8em;
+}
+
+.markdown-highlight-modal h2 {
+    color: #ffa500;
+    font-size: 1.5em;
+}
+
+.markdown-highlight-modal blockquote {
+    color: #6a5acd;
+    border-left: 4px solid #6a5acd;
+    padding-left: 10px;
+    margin-left: 0;
+}
+
+.markdown-highlight-modal p {
+    color: #333;
+    font-size: 1em;
+}

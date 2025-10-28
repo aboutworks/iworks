@@ -1,0 +1,148 @@
+# Obsidian Sample Plugin
+
+This is a sample plugin for Obsidian (https://obsidian.md).
+
+This project uses TypeScript to provide type checking and documentation.
+The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+
+This sample plugin demonstrates some of the basic functionality the plugin API can do.
+- Adds a ribbon icon, which shows a Notice when clicked.
+- Adds a command "Open Sample Modal" which opens a Modal.
+- Adds a plugin setting tab to the settings page.
+- Registers a global click event and output 'click' to the console.
+- Registers a global interval which logs 'setInterval' to the console.
+
+## First time developing plugins?
+
+Quick starting guide for new plugin devs:
+
+- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
+- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
+- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
+- Install NodeJS, then run `npm i` in the command line under your repo folder.
+- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
+- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
+- Reload Obsidian to load the new version of your plugin.
+- Enable plugin in settings window.
+- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+
+## Releasing new releases
+
+- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
+- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
+- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
+- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
+- Publish the release.
+
+> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
+> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+
+## Adding your plugin to the community plugin list
+
+- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
+- Publish an initial version.
+- Make sure you have a `README.md` file in the root of your repo.
+- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+
+## How to use
+
+- Clone this repo.
+- Make sure your NodeJS is at least v16 (`node --version`).
+- `npm i` or `yarn` to install dependencies.
+- `npm run dev` to start compilation in watch mode.
+
+## Manually installing the plugin
+
+- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+
+## Improve code quality with eslint (optional)
+- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
+- To use eslint with this project, make sure to install eslint from terminal:
+  - `npm install -g eslint`
+- To use eslint to analyze this project use this command:
+  - `eslint main.ts`
+  - eslint will then create a report with suggestions for code improvement by file and line number.
+- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
+  - `eslint .\src\`
+
+## Funding URL
+
+You can include funding URLs where people who use your plugin can financially support it.
+
+The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+
+```json
+{
+    "fundingUrl": "https://buymeacoffee.com"
+}
+```
+
+If you have multiple URLs, you can also do:
+
+```json
+{
+    "fundingUrl": {
+        "Buy Me a Coffee": "https://buymeacoffee.com",
+        "GitHub Sponsor": "https://github.com/sponsors",
+        "Patreon": "https://www.patreon.com/"
+    }
+}
+```
+
+## API Documentation
+
+See https://github.com/obsidianmd/obsidian-api
+
+## 从仓库分析得到的使用与打包说明（自动生成）
+
+下面内容基于对当前仓库文件的分析（`src/main.ts`, `main.js`, `manifest.json`, `package.json`, `esbuild.config.mjs` 等）。如果你需要把本插件放到 Obsidian 中使用或发布，这些步骤和注意事项会很有用。
+
+### 快速结论
+- 源码入口：`src/main.ts`。
+- 构建产物：仓库根的 `main.js`（由 esbuild 打包，文件头有 "THIS IS A GENERATED/BUNDLED FILE BY ESBUILD" 注释）。
+- 样式：插件在运行时会注入 `${this.manifest.dir}/styles.css`，因此发布/安装时需与 `main.js` 同级放置 `styles.css`。
+- manifest id：`manifest.json` 中的 `id` 为 `jimmywong`（安装时插件目录通常使用该 id）。
+- 构建工具：使用 `esbuild`（`esbuild.config.mjs`）。`dev` 模式会启动 watch，`production` 会生成压缩产物并退出。
+
+### 常用命令（macOS / zsh）
+在仓库根目录运行：
+
+```bash
+# 安装依赖（第一次或依赖变更时）
+npm install
+
+# 开发（启动 watch，修改后自动重建 main.js）
+npm run dev
+
+# 生产构建（先做类型检查，再生成 minify 的 main.js）
+npm run build
+```
+
+### 本地安装到 Obsidian（手动）
+1. 在 Obsidian Vault 中创建插件目录（示例）：
+
+  Vault/.obsidian/plugins/jimmywong/
+
+2. 将下列文件复制到该目录：
+  - `main.js`
+  - `manifest.json`
+  - `styles.css`（如果存在）
+
+3. 在 Obsidian 设置 -> Community plugins 中启用该插件（如为开发版，需先允许第三方插件）。
+
+提示：如果你把仓库 clone 到 Vault 的 `.obsidian/plugins/jimmywong` 并运行 `npm run dev`，每次打包后在 Obsidian 中 reload 插件可以实现快速开发流程（近似热重载）。
+
+### 发布/Release 注意
+- README 中建议在 GitHub Release 时上传 `manifest.json`, `main.js`, `styles.css` 作为附件，且 `manifest.json` 要同时保存在仓库根。
+- package.json 中含 `version` 脚本（`version-bump.mjs`）可用于自动 bump 版本与更新 `versions.json`。
+
+### 行为/安全提醒
+- 插件在启动时会调用 `connectWebSocket()` 并尝试连接 `ws://localhost:30725`，若本地没有对应服务，会在控制台或通过 Notice 报错/提示。若不需要该功能，可在 `src/main.ts` 中移除或延迟该调用。
+- esbuild 配置将 `obsidian` 标记为 external（不会被打包），这是正确的：Obsidian 在运行时提供该 API。其它依赖（如 `marked`）会被打包进 `main.js`，因此构建后的 `main.js` 是可独立运行的插件入口文件。
+
+### 我可以帮你的后续事情（选项）
+- 检查并显示项目中的 `styles.css` 内容（如果你想确认样式）。
+- 修改源码（例如把 WebSocket 改为按需开启），并帮你构建一次生产包。
+- 帮你把仓库复制到指定 Vault 插件目录并示范一次本地安装流程。
+
+如果需要我直接把某个步骤执行（例如修改源码或复制文件到 Vault 路径），告诉我你要我做哪一步，以及 Vault 的绝对路径。
