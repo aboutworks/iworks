@@ -1,5 +1,16 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import { marked } from 'marked'; // 使用 marked 库解析 Markdown
+
+import SampleModal from './components/SampleModal';
+import MarkdownHighlightModal from './components/MarkdownHighlightModal';
+import ImageListModal from './components/ImageListModal';
+import SampleSettingTab from './views/SampleSettingTab';
+
+interface ImageInfo {
+	src: string;
+	alt: string;
+	lineNumber: number;
+}
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -85,6 +96,48 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
+		// 添加一个命令，用于显示图片列表
+		this.addCommand({
+			id: 'show-image-list',
+			name: 'Show Image List',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				// 获取当前编辑器的内容
+				const content = editor.getValue();
+				const lines = content.split('\n');
+				
+				// 提取所有图片信息
+				const images: ImageInfo[] = [];
+				const imageRegex = /!\[(.*?)\]\((.*?)\)/g;
+				
+				lines.forEach((line, index) => {
+					let match;
+					while ((match = imageRegex.exec(line)) !== null) {
+						images.push({
+							alt: match[1],
+							src: match[2],
+							lineNumber: index + 1
+						});
+					}
+				});
+
+				if (images.length === 0) {
+					new Notice('当前文档中没有找到图片');
+					return;
+				}
+
+				// 隐藏文档中的图片（将图片语法注释掉）
+				const hiddenContent = content.replace(/!\[(.*?)\]\((.*?)\)/g, '<!-- ![$1]($2) -->');
+				editor.setValue(hiddenContent);
+
+				// 显示图片数量通知
+				new Notice(`共找到 ${images.length} 张图片，已隐藏图片并在右侧显示列表`);
+
+				// 打开图片列表模态框
+				const modal = new ImageListModal(this.app, images);
+				modal.open();
+			}
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 
@@ -147,72 +200,5 @@ export default class MyPlugin extends Plugin {
 			console.log("WebSocket connection closed");
 			new Notice("WebSocket connection closed");
 		};
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-// Modal 用于显示高亮后的 Markdown 内容
-class MarkdownHighlightModal extends Modal {
-	htmlContent: string;
-
-	constructor(app: App, htmlContent: string) {
-		super(app);
-		this.htmlContent = htmlContent;
-	}
-
-	onOpen() {
-		const { contentEl } = this;
-
-		// 设置 Modal 的内容为解析后的 HTML
-		contentEl.innerHTML = this.htmlContent;
-
-		// 添加样式类以便自定义样式
-		contentEl.addClass('markdown-highlight-modal');
-	}
-
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
 	}
 }
